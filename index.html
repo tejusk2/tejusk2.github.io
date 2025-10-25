@@ -3,10 +3,135 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>My Portfolio</title>
+    <title>Tejus Krishnan - Portfolio</title>
+    
+    <style>
+        /* --- General Styles --- */
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            line-height: 1.6;
+            background-color: #f4f4f4; /* Light gray background */
+            color: #333;
+            margin: 0;
+            padding: 0;
+        }
+
+        /* --- Layout Container --- */
+        main {
+            max-width: 1000px; /* Keeps content from being too wide */
+            margin: 20px auto; /* Centers the content */
+            padding: 25px;
+            background-color: #ffffff;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        header {
+            text-align: center;
+            padding-bottom: 20px;
+            border-bottom: 2px solid #eeeeee;
+        }
+
+        h1, h2 {
+            color: #2c3e50;
+        }
+
+        h1 {
+            margin-bottom: 0;
+        }
+
+        h2 {
+            padding-bottom: 10px;
+        }
+        
+        section {
+            margin-top: 30px;
+        }
+
+        /* --- Projects Section (Google Slides) --- */
+        .slideshow-container {
+            /* This wrapper centers the iframe */
+            text-align: center;
+            margin-top: 20px;
+            background-color: #fafafa;
+            padding: 15px;
+            border-radius: 8px;
+            border: 1px solid #ddd;
+        }
+
+        .slideshow-container iframe {
+            max-width: 100%; /* Makes the slideshow responsive */
+            border: none; /* Removes default iframe border */
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+
+        /* --- About Me Section --- */
+        .about-container {
+            display: flex;
+            align-items: center;
+            gap: 25px; /* Space between image and text */
+        }
+
+        .profile-pic {
+            width: 150px;
+            height: 150px;
+            border-radius: 50%; /* Makes the image a circle */
+            object-fit: cover; /* Prevents the image from stretching */
+            border: 3px solid #eee;
+        }
+        
+        .about-text p {
+            margin-top: 0;
+        }
+
+        /* --- Mobile Responsive --- */
+        @media (max-width: 600px) {
+            .about-container {
+                /* Stacks image and text vertically on small screens */
+                flex-direction: column; 
+                text-align: center;
+            }
+
+            main {
+                margin: 10px;
+                padding: 15px;
+            }
+        }
+    </style>
 </head>
 <body>
-    <h1>Welcome to My Portfolio!</h1>
-    <p>This is where I'll showcase my projects.</p>
+
+    <main>
+        <header>
+            <h1>Tejus's Portfolio</h1>
+            <p>Welcome to my personal project showcase.</p>
+        </header>
+
+        <section id="projects">
+            <h2>My Projects</h2>
+            <p>Ongoing Project - DC-DC Step Down Converter(Switch Mode Power Supply without dedicated IC)</p>
+            
+            <div class="slideshow-container">
+                <iframe src="https://docs.google.com/presentation/d/e/2PACX-1vQ9Avb8KD8meHXPUt-v7HtVrJRstzXkiG0MVzXzXs_ilffiKlZsMCbnpzY2_i_6s5Hl75S4TgTsI19d/pubembed?start=false&loop=false&delayms=30000" frameborder="0" width="960" height="569" allowfullscreen="true" mozallowfullscreen="true" webkitallowfullscreen="true"></iframe>
+            </div>
+        </section>
+
+        <section id="about">
+            <h2>About</h2>
+            <div class="about-container">
+                            
+                <div class="about-text">
+                    <p>
+                        First Year Electrical Engineering Student at GA TECH
+                    </p>
+                    <p>
+                        looking to get into hardware design...contact: tejus.krish22@gmail.com
+                    </p>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
 </body>
 </html>
