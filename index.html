@@ -96,11 +96,14 @@
             padding: 20px 0;
         }
 
+        /* flip behaviour — use class for touch/click + hover for pointer devices */
         .flip-card {
             background-color: transparent;
             width: 100%;
             height: 200px;
             perspective: 1000px;
+            cursor: pointer;
+            -webkit-tap-highlight-color: transparent;
         }
 
         .flip-card-inner {
@@ -108,11 +111,17 @@
             width: 100%;
             height: 100%;
             text-align: center;
-            transition: transform 0.8s;
+            transition: transform 0.6s;
             transform-style: preserve-3d;
         }
 
+        /* hover still works for mouse */
         .flip-card:hover .flip-card-inner {
+            transform: rotateY(180deg);
+        }
+
+        /* toggle class used for touch/click */
+        .flip-card.is-flipped .flip-card-inner {
             transform: rotateY(180deg);
         }
 
@@ -183,11 +192,11 @@
         
 
         .prev {
-            left: 10px;
+            left: 5px;
         }
 
         .next {
-            right: 10px;
+            right: 5px;
         }
 
         .carousel-slide h3 {
@@ -308,6 +317,27 @@
         }
         document.addEventListener('scroll', getScrollPercent);
         setInterval(typewriter, speed);
+
+        /* --- enable flip on touch/click for mobile --- */
+        const flipCards = document.querySelectorAll('.flip-card');
+        flipCards.forEach(card => {
+            // toggle on click (works on touch devices too)
+            card.addEventListener('click', (e) => {
+                card.classList.toggle('is-flipped');
+            });
+
+            // prevent interactive elements inside a card from also toggling the card
+            card.querySelectorAll('a, button, iframe').forEach(el => {
+                el.addEventListener('click', (ev) => ev.stopPropagation());
+            });
+        });
+
+        // close any open card when clicking outside
+        document.addEventListener('click', (e) => {
+            if (!e.target.closest('.flip-card')) {
+                flipCards.forEach(c => c.classList.remove('is-flipped'));
+            }
+        });
     });
     </script>
 </head>
