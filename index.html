@@ -10,20 +10,20 @@
         body {
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
             line-height: 1.6;
-            background-color: #f4f4f4; /* Light gray background */
-            color: #333;
+            background-color: #212020; /* Light gray background */
+            color: #ffffff;
             margin: 0;
             padding: 0;
         }
 
         /* --- Layout Container --- */
         main {
-            max-width: 1000px; /* Keeps content from being too wide */
+            max-width: 1300px; /* Keeps content from being too wide */
             margin: 20px auto; /* Centers the content */
             padding: 25px;
-            background-color: #ffffff;
-            border-radius: 8px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            background-color: #212020;
+            border-radius: 0px;
+            box-shadow: 0 0px 30px 20px rgba(255, 255, 255, 0.5);
         }
 
         header {
@@ -33,7 +33,7 @@
         }
 
         h1, h2 {
-            color: #2c3e50;
+            color: #ffffff;
         }
 
         h1 {
@@ -47,16 +47,20 @@
         section {
             margin-top: 30px;
         }
+        #about-header{
+            color: white;
+            background-clip: text;
+        }    
 
         /* --- Projects Section (Google Slides) --- */
         .slideshow-container {
             /* This wrapper centers the iframe */
             text-align: center;
             margin-top: 20px;
-            background-color: #fafafa;
-            padding: 15px;
-            border-radius: 8px;
-            border: 1px solid #ddd;
+            background-color: #212020;
+            border-radius: 15px;
+            border-width: 0px;
+            border-style:solid;
         }
 
         .slideshow-container iframe {
@@ -83,6 +87,115 @@
         .about-text p {
             margin-top: 0;
         }
+                /* --- Flip Cards --- */
+        .cards-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            padding: 20px 0;
+        }
+
+        .flip-card {
+            background-color: transparent;
+            width: 100%;
+            height: 200px;
+            perspective: 1000px;
+        }
+
+        .flip-card-inner {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            text-align: center;
+            transition: transform 0.8s;
+            transform-style: preserve-3d;
+        }
+
+        .flip-card:hover .flip-card-inner {
+            transform: rotateY(180deg);
+        }
+
+        .flip-card-front, .flip-card-back {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            backface-visibility: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            box-sizing: border-box;
+            border-radius: 0px;
+        }
+
+        .flip-card-front {
+            background: #212020;
+            border: 2px solid white;
+            color: white;
+        }
+
+        .flip-card-back {
+            background-color: #212020;
+            color: white;
+            transform: rotateY(180deg);
+            border: 2px solid white;
+        }
+
+        .flip-card-back p {
+            margin: 0;
+            font-size: 0.9em;
+        }
+                /* --- Carousel Styles --- */
+        .carousel-container {
+            position: relative;
+            width: 100%;
+            overflow: hidden;
+        }
+
+        .carousel-track {
+            display: flex;
+            transition: transform 0.5s ease-in-out;
+            width: 200%;
+        }
+
+        .carousel-slide {
+            flex: 0 0 50%;
+            padding: 0 20px;
+            box-sizing: border-box;
+        }
+
+        .carousel-button {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            background: rgba(255, 255, 255, 0.2);
+            border: none;
+            width: 40px;
+            height: 40px;
+            border-radius: 0;
+            cursor: pointer;
+            color: white;
+            font-size: 18px;
+            z-index: 10;
+            transition: background 0.3s;
+        }
+
+        .carousel-button:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        .prev {
+            left: 10px;
+        }
+
+        .next {
+            right: 10px;
+        }
+
+        .carousel-slide h3 {
+            text-align: center;
+            margin-bottom: 20px;
+        }
 
         /* --- Mobile Responsive --- */
         @media (max-width: 600px) {
@@ -97,52 +210,183 @@
                 padding: 15px;
             }
         }
+        @media (min-width: 601px) and (max-width: 1100px) {
+            .cards-container {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            
+        }
+
+        @media (max-width: 600px) {
+            .cards-container {
+                grid-template-columns: 1fr;
+            }
+        }
     </style>
+    <script>
+    let currentSlide = 0;
+    function moveCarousel(direction) {
+        const track = document.querySelector('.carousel-track');
+        currentSlide = (currentSlide + direction + 2) % 2; // For 2 slides
+        track.style.transform = `translateX(-${currentSlide * 50}%)`;
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+        const label = document.getElementById("about-header"); // ensure this id is unique in the page
+        const string1 = "Electrical Engineering Undergrad at Georgia Institute of Technology";
+        const string2 = "Graduating May 2028"; // unused but kept if you want to add
+        const speed = 40; // ms per tick
+        let pos = 0;
+        let direction = 1; // 1 = typing, -1 = deleting
+        let wait = 0;
+        let str_num = 0;
+        label.innerHTML = "&nbsp";
+        function typewriter() {
+            if(str_num == 0){
+                const target = string1;
+                if (direction === 1) {
+                    // type forward
+                    pos++;
+                    label.textContent = target.slice(0, pos);
+                    if (pos === target.length) {
+                        direction = -1;
+                        wait = 0;
+                    }
+                } else {
+                    // wait a bit at the end before deleting
+                    if (wait < 40) {
+                        wait++;
+                        return;
+                    }
+                    // delete characters
+                    pos--;
+                    if(pos === 0){
+                        label.innerHTML = "&nbsp";
+                        str_num = 1;
+                        direction = 1;
+                    }else{
+                        label.textContent = target.slice(0, pos);
+                    }
+                    
+                }
+            }else{
+                const target = string2;
+                if (direction === 1) {
+                    // type forward
+                    pos++;
+                    label.textContent = target.slice(0, pos);
+                    if (pos === target.length) {
+                        direction = -1;
+                        wait = 0;
+                    }
+                } else {
+                    // wait a bit at the end before deleting
+                    if (wait < 40) {
+                        wait++;
+                        return;
+                    }
+                    // delete characters
+                    pos--;
+                    if(pos === 0){
+                        label.innerHTML = "&nbsp";
+                        str_num = 0;
+                        direction = 1;
+                    }else{
+                        label.textContent = target.slice(0, pos);
+                    }
+                }
+            }    
+        }
+
+        function getScrollPercent() {
+            var h = document.documentElement, 
+                b = document.body,
+                st = 'scrollTop',
+                sh = 'scrollHeight';
+            let sp = (h[st]||b[st]) / ((h[sh]||b[sh]) - h.clientHeight);
+            let shadowValue = Math.round(255 * sp);
+            document.getElementById("paper").style.boxShadow = `0 0px 30px 20px rgba(${255-shadowValue}, ${255-shadowValue}, ${255-shadowValue}, 0.5)`;
+        }
+        document.addEventListener('scroll', getScrollPercent);
+        setInterval(typewriter, speed);
+    });
+    </script>
 </head>
 <body>
 
-    <main>
+    <main id="paper">
         <header>
             <h1>Tejus's Portfolio</h1>
-            <p>Electrical Engineering Undergrad at Georgia Institute of Technology</p>
-            <p>Expected Grad: May 2028</p>
-            <p>some projects I've worked on...</p>
+            <p id="about-header"></p>
         </header>
-        <section id="about">
-            <h2>About</h2>
-            <div class="about-container">
-                            
-                <div class="about-text">
-                    <p>
-                        <b>Interests</b>: Hardware Design, Computer Harwdare Acceleration, Robotic Control, Computer Vision, Software Dev
-                    </p>
-                    <p>
-                        <b>Skills</b>: C++, Java, Python, SystemVerilog, OpenCL, OpenCV&YOLO, CAD, KiCAD, LTSPICE
-                    </p>
-                    <p>
-                        <b>School Involvements</b>: 
-                        <ul>
-                            <li>Silicon Jackets(Georgia Tech Chip Design Club) - Digital Design Subteam</li>
-                            <li>Medical Robotics - Prosthetic Hand Slip Sensing Research Subteam</li>
-                        </ul>
-                    </p>
-                    <p>
-                        <b>Contact</b>: tejus.krish22@gmail.com
-                    </p>
+                <section id="about">
+            <div class="cards-container">
+                <div class="flip-card">
+                    <div class="flip-card-inner">
+                        <div class="flip-card-front">
+                            <h3>Interests</h3>
+                        </div>
+                        <div class="flip-card-back">
+                            <p>Hardware Design, Computer Hardware Acceleration, Robotic Control, Computer Vision, Software Dev</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="flip-card">
+                    <div class="flip-card-inner">
+                        <div class="flip-card-front">
+                            <h3>Skills</h3>
+                        </div>
+                        <div class="flip-card-back">
+                            <p>C++, Java, Python, SystemVerilog, OpenCL, OpenCV&YOLO, CAD, KiCAD, LTSPICE</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="flip-card">
+                    <div class="flip-card-inner">
+                        <div class="flip-card-front">
+                            <h3>Involvement</h3>
+                        </div>
+                        <div class="flip-card-back">
+                            <p><b>Silicon Jackets</b> - Digital Design Subteam</p>
+                            <p><b>Medical Robotics</b> - Prosthetic Hand Slip Sensing Research</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="flip-card">
+                    <div class="flip-card-inner">
+                        <div class="flip-card-front">
+                            <h3>Contact</h3>
+                        </div>
+                        <div class="flip-card-back">
+                            <p>tejus.krish22@gmail.com</p>
+                        </div>
+                    </div>
                 </div>
             </div>
         </section>
         <section id="projects">
             <h2>My Projects</h2>
-            <p>Ongoing Project - DC-DC Step Down Converter(Switch Mode Power Supply without dedicated IC)</p>
-            
-            <div class="slideshow-container">
-                <iframe src="https://docs.google.com/presentation/d/e/2PACX-1vQ9Avb8KD8meHXPUt-v7HtVrJRstzXkiG0MVzXzXs_ilffiKlZsMCbnpzY2_i_6s5Hl75S4TgTsI19d/pubembed?start=false&loop=false&delayms=30000" frameborder="0" width="960" height="569" allowfullscreen="true" mozallowfullscreen="true" webkitallowfullscreen="true"></iframe>
-            </div>
-            <p>Finished Project - Hardware Accelerated Gaussian Blur with openCL</p>
-            
-            <div class="slideshow-container">
-                <iframe src="https://docs.google.com/presentation/d/e/2PACX-1vRy0al2PX6Dpy5qtI_rICuiPOgtUo3XjLUQrbeVC6itEJl42MkkKRymAr3gOgbQpJ9t_-zDq6Z1WLJx/pubembed?start=false&loop=false&delayms=30000" frameborder="0" width="960" height="569" allowfullscreen="true" mozallowfullscreen="true" webkitallowfullscreen="true"></iframe>
+            <div class="carousel-container">
+                <button class="carousel-button prev" onclick="moveCarousel(-1)">❮</button>
+                <div class="carousel-track">
+                    <div class="carousel-slide">
+                        <h3>Ongoing Project - DC-DC Step Down Converter</h3>
+                        <div class="slideshow-container">
+                            <iframe src="https://docs.google.com/presentation/d/e/2PACX-1vQ9Avb8KD8meHXPUt-v7HtVrJRstzXkiG0MVzXzXs_ilffiKlZsMCbnpzY2_i_6s5Hl75S4TgTsI19d/pubembed?start=false&loop=false&delayms=30000" frameborder="0" width="960" height="569" allowfullscreen="true" mozallowfullscreen="true" webkitallowfullscreen="true"></iframe>
+                        </div>
+                    </div>
+                    <div class="carousel-slide">
+                        <h3>Finished Project - Hardware Accelerated Gaussian Blur</h3>
+                        <div class="slideshow-container">
+                            <iframe src="https://docs.google.com/presentation/d/e/2PACX-1vRy0al2PX6Dpy5qtI_rICuiPOgtUo3XjLUQrbeVC6itEJl42MkkKRymAr3gOgbQpJ9t_-zDq6Z1WLJx/pubembed?start=false&loop=false&delayms=30000" frameborder="0" width="960" height="569" allowfullscreen="true" mozallowfullscreen="true" webkitallowfullscreen="true"></iframe>
+                        </div>
+                    </div>
+                </div>
+                <button class="carousel-button next" onclick="moveCarousel(1)">❯</button>
             </div>
         </section>
 
