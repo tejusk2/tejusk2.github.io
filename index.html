@@ -429,6 +429,29 @@ function moveCarousel(direction) {
             const modal = document.getElementById(projectId);
             modal.classList.remove('active');
         }
+
+        document.addEventListener('DOMContentLoaded', function () {
+            const projectCards = document.querySelectorAll('.flip-card');
+
+            projectCards.forEach(card => {
+                card.addEventListener('click', function () {
+                    const isMobile = window.matchMedia('(max-width: 768px)').matches;
+
+                    if (isMobile) {
+                        const projectId = card.getAttribute('onclick').match(/'(.*?)'/)[1];
+
+                        if (projectId === 'project1') {
+                            window.location.href = 'https://docs.google.com/presentation/d/e/2PACX-1vQ9Avb8KD8meHXPUt-v7HtVrJRstzXkiG0MVzXzXs_ilffiKlZsMCbnpzY2_i_6s5Hl75S4TgTsI19d/pub?start=false&loop=false&delayms=30000';
+                        } else if (projectId === 'project2') {
+                            window.location.href = 'https://docs.google.com/presentation/d/e/2PACX-1vRy0al2PX6Dpy5qtI_rICuiPOgtUo3XjLUQrbeVC6itEJl42MkkKRymAr3gOgbQpJ9t_-zDq6Z1WLJx/pub?start=false&loop=false&delayms=30000';
+                        }
+                    } else {
+                        const projectId = card.getAttribute('onclick').match(/'(.*?)'/)[1];
+                        openProjectModal(projectId);
+                    }
+                });
+            });
+        });
     });
     </script>
 </head>
