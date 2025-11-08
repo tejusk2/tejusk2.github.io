@@ -159,49 +159,45 @@
         .carousel-container {
             position: relative;
             width: 100%;
-            overflow: hidden;
+            display: flex;
+            align-items: center; /* Align arrows and slides vertically */
+            text-align:center;
+            gap: 10px; /* Space between arrows and slides */
         }
 
         .carousel-track {
             display: flex;
             transition: transform 0.5s ease-in-out;
-            width: 200%;
+            width: 100%;
+            overflow: hidden; /* Prevent slides from overflowing */
         }
 
         .carousel-slide {
-            flex: 0 0 50%;
+            flex: 0 0 100%; /* Each slide takes up 100% of the container width */
             padding: 0 20px;
             box-sizing: border-box;
         }
 
         .carousel-button {
-            position: absolute;
-            top: 50%;
-            transform: translateY(-50%);
             background: transparent;
             border: none;
             width: 40px;
             height: 40px;
-            border-radius: 0;
             cursor: pointer;
             color: white;
-            font-size: 18px;
-            z-index: 10;
+            font-size: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
-        
-
-        .prev {
-            left: 5px;
-        }
-
-        .next {
-            right: 5px;
-        }
-
-        .carousel-slide h3 {
+        .slide-header {
             text-align: center;
-            margin-bottom: 20px;
+            margin-bottom: 10px; /* Space between title and slideshow */
+        }
+
+        .slideshow-container {
+            text-align: center;
         }
 
         /* --- Mobile Responsive --- */
@@ -230,14 +226,84 @@
                 grid-template-columns: 1fr;
             }
         }
+
+        .project-cards-container {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .project-card {
+            background: #f4f4f4;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 20px;
+            text-align: center;
+            cursor: pointer;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .project-card:hover {
+            transform: scale(1.05);
+            box-shadow: 0 6px 10px rgba(0, 0, 0, 0.15);
+        }
+
+        .project-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .project-modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: #212020;
+            padding: 20px;
+            border-radius: 8px;
+            position: relative;
+            max-width: 90%;
+            max-height: 90%;
+            overflow: auto;
+        }
+
+        .close-button {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            font-size: 24px;
+            cursor: pointer;
+            
+        }
     </style>
     <script>
     let currentSlide = 0;
-    function moveCarousel(direction) {
-        const track = document.querySelector('.carousel-track');
-        currentSlide = (currentSlide + direction + 2) % 2; // For 2 slides
-        track.style.transform = `translateX(-${currentSlide * 50}%)`;
-    }
+
+function moveCarousel(direction) {
+    const track = document.querySelector('.carousel-track');
+    const slides = document.querySelectorAll('.carousel-slide');
+    const totalSlides = slides.length;
+
+    // Update the current slide index
+    currentSlide = (currentSlide + direction + totalSlides) % totalSlides;
+
+    // Calculate the new translateX value based on the current slide
+    const slideWidth = slides[0].clientWidth; // Get the width of a single slide
+    const newTranslateX = -currentSlide * slideWidth;
+
+    // Apply the transform to the track
+    track.style.transform = `translateX(${newTranslateX}px)`;
+}
 
     document.addEventListener('DOMContentLoaded', function() {
         const label = document.getElementById("about-header"); // ensure this id is unique in the page
@@ -313,31 +379,56 @@
                 sh = 'scrollHeight';
             let sp = (h[st]||b[st]) / ((h[sh]||b[sh]) - h.clientHeight);
             let shadowValue = Math.round(255 * sp);
-            document.getElementById("paper").style.boxShadow = `0 0px 30px 20px rgba(${255-shadowValue}, ${255-shadowValue}, ${255-shadowValue}, 0.5)`;
+            document.getElementById("paper").style.boxShadow = `0 0px 30px 20px rgba(${255-shadowValue}, ${255-shadowValue}, ${255 - shadowValue}, 0.5)`;
         }
         document.addEventListener('scroll', getScrollPercent);
         setInterval(typewriter, speed);
 
-        /* --- enable flip on touch/click for mobile --- */
+        /* --- Enable flip on touch/click for mobile --- */
         const flipCards = document.querySelectorAll('.flip-card');
         flipCards.forEach(card => {
-            // toggle on click (works on touch devices too)
+            // Toggle the `is-flipped` class on click
             card.addEventListener('click', (e) => {
+                // Close all other cards first
+                flipCards.forEach(c => {
+                    if (c !== card) {
+                        c.classList.remove('is-flipped');
+                    }
+                });
+
+                // Toggle the clicked card
                 card.classList.toggle('is-flipped');
             });
 
-            // prevent interactive elements inside a card from also toggling the card
+            // Prevent interactive elements inside a card from toggling the card
             card.querySelectorAll('a, button, iframe').forEach(el => {
                 el.addEventListener('click', (ev) => ev.stopPropagation());
             });
         });
 
-        // close any open card when clicking outside
+        // Close any open card when clicking outside
         document.addEventListener('click', (e) => {
             if (!e.target.closest('.flip-card')) {
                 flipCards.forEach(c => c.classList.remove('is-flipped'));
             }
         });
+
+        window.openProjectModal = function(projectId) {
+            const modal = document.getElementById(projectId);
+            modal.classList.add('active');
+
+            // Add event listener to close modal when clicking outside the content
+            modal.addEventListener('click', function(event) {
+                if (event.target === modal) {
+                    closeProjectModal(projectId);
+                }
+            });
+        }
+
+        window.closeProjectModal = function(projectId) {
+            const modal = document.getElementById(projectId);
+            modal.classList.remove('active');
+        }
     });
     </script>
 </head>
@@ -397,23 +488,41 @@
             </div>
         </section>
         <section id="projects">
-            <div class="carousel-container">
-                <button class="carousel-button prev" onclick="moveCarousel(-1)">❮</button>
-                <div class="carousel-track">
-                    <div class="carousel-slide">
-                        <h3>Ongoing Project - DC-DC Step Down Converter</h3>
-                        <div class="slideshow-container">
-                            <iframe src="https://docs.google.com/presentation/d/e/2PACX-1vQ9Avb8KD8meHXPUt-v7HtVrJRstzXkiG0MVzXzXs_ilffiKlZsMCbnpzY2_i_6s5Hl75S4TgTsI19d/pubembed?start=false&loop=false&delayms=30000" frameborder="0" width="960" height="569" allowfullscreen="true" mozallowfullscreen="true" webkitallowfullscreen="true"></iframe>
+            <div class="cards-container">
+                <div class="flip-card" onclick="openProjectModal('project1')">
+                    <div class="flip-card-inner">
+                        <div class="flip-card-front">
+                            <h3>Ongoing Project - DC-DC Step Down Converter</h3>
                         </div>
-                    </div>
-                    <div class="carousel-slide">
-                        <h3>Finished Project - Hardware Accelerated Gaussian Blur</h3>
-                        <div class="slideshow-container">
-                            <iframe src="https://docs.google.com/presentation/d/e/2PACX-1vRy0al2PX6Dpy5qtI_rICuiPOgtUo3XjLUQrbeVC6itEJl42MkkKRymAr3gOgbQpJ9t_-zDq6Z1WLJx/pubembed?start=false&loop=false&delayms=30000" frameborder="0" width="960" height="569" allowfullscreen="true" mozallowfullscreen="true" webkitallowfullscreen="true"></iframe>
+                        <div class="flip-card-back">
+                            <p>Click to view slideshow</p>
                         </div>
                     </div>
                 </div>
-                <button class="carousel-button next" onclick="moveCarousel(1)">❯</button>
+                <div class="flip-card" onclick="openProjectModal('project2')">
+                    <div class="flip-card-inner">
+                        <div class="flip-card-front">
+                            <h3>Finished Project - Hardware Accelerated Gaussian Blur</h3>
+                        </div>
+                        <div class="flip-card-back">
+                            <p>Click to view slideshow</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Modal for Project 1 -->
+            <div id="project1" class="project-modal">
+                <div class="modal-content">
+                    <iframe src="https://docs.google.com/presentation/d/e/2PACX-1vQ9Avb8KD8meHXPUt-v7HtVrJRstzXkiG0MVzXzXs_ilffiKlZsMCbnpzY2_i_6s5Hl75S4TgTsI19d/pubembed?start=false&loop=false&delayms=30000" frameborder="0" width="960" height="569" allowfullscreen="true" mozallowfullscreen="true" webkitallowfullscreen="true"></iframe>
+                </div>
+            </div>
+
+            <!-- Modal for Project 2 -->
+            <div id="project2" class="project-modal">
+                <div class="modal-content">
+                    <iframe src="https://docs.google.com/presentation/d/e/2PACX-1vRy0al2PX6Dpy5qtI_rICuiPOgtUo3XjLUQrbeVC6itEJl42MkkKRymAr3gOgbQpJ9t_-zDq6Z1WLJx/pubembed?start=false&loop=false&delayms=30000" frameborder="0" width="960" height="569" allowfullscreen="true" mozallowfullscreen="true" webkitallowfullscreen="true"></iframe>
+                </div>
             </div>
         </section>
 
