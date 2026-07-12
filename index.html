@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tejus Krishnan - Portfolio</title>
+    <link rel="icon" type="image/x-icon" href="favicon.ico">
+    <link rel="stylesheet" href="styles/main.css?v=1.1">
+</head>
+
+<body>
+    <main class="desktop">
+        <div class="center-content">
+            <h1 class="my-name">Tejus Krishnan</h1>
+        </div>
+
+        <div class="desktop-icons">
+            <div class="icon" data-href="pages/about.html" tabindex="0">
+                <img src="ASSETS/Windows%20XP%20High%20Resolution%20Icon%20Pack/Windows%20XP%20Icons/User%20Accounts.png"
+                    alt="About">
+                <span class="icon-label">About</span>
+            </div>
+
+            <div class="icon" data-href="pages/involvements.html" tabindex="0">
+                <img src="ASSETS/Windows%20XP%20High%20Resolution%20Icon%20Pack/Windows%20XP%20Icons/Workgroup.png"
+                    alt="Involvements">
+                <span class="icon-label">Involvements</span>
+            </div>
+
+            <div class="icon" data-href="pages/projects.html" tabindex="0">
+                <img src="ASSETS/Windows%20XP%20High%20Resolution%20Icon%20Pack/Windows%20XP%20Icons/Folder%20Closed.png"
+                    alt="Projects">
+                <span class="icon-label">Projects</span>
+            </div>
+
+            <div class="icon" data-href="pages/resume.html" tabindex="0">
+                <img src="ASSETS/Windows%20XP%20High%20Resolution%20Icon%20Pack/Windows%20XP%20Icons/Certificate.png"
+                    alt="Resume">
+                <span class="icon-label">Resume</span>
+            </div>
+
+            <div class="icon" data-href="pages/contact.html" tabindex="0">
+                <img src="ASSETS/Windows%20XP%20High%20Resolution%20Icon%20Pack/Windows%20XP%20Icons/Address%20Book.png"
+                    alt="Contact">
+                <span class="icon-label">Contact</span>
+            </div>
+        </div>
+    </main>
+
+    <!-- App Window (Hidden by default) -->
+    <div id="app-window" class="window hidden">
+        <div class="window-header">
+            <span class="window-title">Window Title</span>
+            <button class="window-close">X</button>
+        </div>
+        <div class="window-content">
+            <iframe id="app-iframe" src="" frameborder="0"></iframe>
+        </div>
+    </div>
+
+    <div class="taskbar">
+        <div class="taskbar-left">
+            <span id="typewriter-text"></span><span class="cursor">|</span>
+        </div>
+        <div class="taskbar-right">
+            <span id="clock">12:00 PM</span>
+        </div>
+    </div>
+
+    <script src="scripts/main.js"></script>
+</body>
+
+</html>

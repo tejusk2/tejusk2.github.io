@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Projects - My Portfolio</title>
+    <style>
+        body {
+            font-family: 'Tahoma', sans-serif;
+            background-color: white;
+            margin: 0;
+            padding: 0;
+            user-select: none;
+        }
+
+        .explorer-toolbar {
+            background-color: #ece9d8;
+            border-bottom: 1px solid #d4d0c8;
+            padding: 4px 6px;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .toolbar-buttons {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            padding-bottom: 4px;
+            border-bottom: 1px solid #d4d0c8;
+        }
+
+        .toolbar-btn {
+            background: transparent;
+            border: 1px solid transparent;
+            padding: 4px 8px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-family: 'Tahoma', sans-serif;
+            font-size: 11px;
+            cursor: pointer;
+            color: #000;
+            border-radius: 3px;
+        }
+        
+        .toolbar-btn:hover:not(:disabled) {
+            border: 1px solid #7f9db9;
+            background: linear-gradient(to bottom, #fff 0%, #ece9d8 100%);
+            box-shadow: 1px 1px 1px rgba(0,0,0,0.15);
+        }
+        
+        .toolbar-btn:active:not(:disabled) {
+            border: 1px solid #7f9db9;
+            background: #d4d0c8;
+            box-shadow: inset 1px 1px 1px rgba(0,0,0,0.15);
+        }
+
+        .toolbar-btn:disabled {
+            color: #aca899;
+            cursor: default;
+        }
+
+        .icon-svg {
+            width: 16px;
+            height: 16px;
+            fill: #0b58a3; /* XP blue */
+        }
+
+        /* Stylized green/blue Back circle */
+        .btn-icon-wrapper.back-circle {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #a1d89b 0%, #2f8e28 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 1px solid #1c6d17;
+            box-shadow: 0 1px 1px rgba(0,0,0,0.2);
+        }
+
+        .toolbar-btn:disabled .btn-icon-wrapper.back-circle {
+            background: #d4d0c8;
+            border-color: #aca899;
+            box-shadow: none;
+        }
+
+        .toolbar-btn:disabled .icon-svg {
+            fill: #aca899;
+            opacity: 0.5;
+        }
+
+        .icon-svg.back-arrow {
+            fill: #fff;
+            width: 12px;
+            height: 12px;
+        }
+
+        .toolbar-btn:disabled .icon-svg.back-arrow {
+            fill: #aca899;
+        }
+
+        .address-row {
+            display: flex;
+            align-items: center;
+            width: 100%;
+            padding-top: 2px;
+        }
+        
+        .address-label {
+            color: #7f9db9;
+            font-size: 11px;
+            margin-right: 5px;
+            width: 50px;
+        }
+
+        .address-bar {
+            flex-grow: 1;
+            padding: 2px 5px;
+            border: 1px solid #7f9db9;
+            background: white;
+            color: #000;
+            font-size: 11px;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            overflow: hidden;
+        }
+
+        .file-view {
+            display: flex;
+            flex-wrap: wrap;
+            padding: 20px;
+            gap: 20px;
+        }
+
+        .file {
+            width: 80px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            cursor: pointer;
+            text-align: center;
+        }
+
+        .file:hover .file-label {
+            background-color: #0b58a3;
+            color: white;
+        }
+
+        .file img {
+            width: 48px;
+            height: 48px;
+            margin-bottom: 5px;
+        }
+
+        .file-label {
+            font-size: 11px;
+            padding: 8px;
+            color: #000;
+            overflow-wrap:break-word;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="explorer-toolbar">
+        <div class="toolbar-buttons">
+            <button class="toolbar-btn" id="btn-back" onclick="goBack()" disabled>
+                <div class="btn-icon-wrapper back-circle">
+                    <svg class="icon-svg back-arrow" viewBox="0 0 24 24"><path d="M20,11V13H8L13.5,18.5L12.08,19.92L4.16,12L12.08,4.08L13.5,5.5L8,11H20Z" /></svg>
+                </div>
+                <span>Back</span>
+            </button>
+        </div>
+        <div class="address-row">
+            <span class="address-label">Address</span>
+            <div class="address-bar" id="address-text">C:\Documents and Settings\Tejus\My Documents\Projects</div>
+        </div>
+    </div>
+    <div class="file-view" id="file-container">
+        <!-- Files will be dynamically generated here -->
+    </div>
+
+    <script>
+        const projectFolders = {
+            "FPGA": [
+                "fpga_i2c_controller.md",
+                "fpga_comb_filter.md"
+            ],
+            "ASIC": [
+                "64_Bit_Adder_ASIC.md",
+                "ring_oscillator_asic.md"
+            ],
+            "Embedded/Low Level": [
+                "hardware accelerated_gaussian_blur.md",
+            ],
+            "Software & Robotics": [
+                "ros2_stanley_pathfinder.md"
+            ]
+        };
+
+        const container = document.getElementById('file-container');
+        let currentFolder = null;
+
+        function selectFolder(folderName) {
+            currentFolder = folderName;
+            const newUrl = currentFolder ? `?folder=${encodeURIComponent(currentFolder)}` : window.location.pathname;
+            history.pushState({ folder: currentFolder }, '', newUrl);
+            render();
+        }
+
+        function goBack() {
+            goBackOrUp();
+        }
+
+
+        function goBackOrUp() {
+            currentFolder = null;
+            history.pushState({ folder: null }, '', window.location.pathname);
+            render();
+        }
+
+        window.onpopstate = (event) => {
+            currentFolder = (event.state && event.state.folder) ? event.state.folder : null;
+            if (!currentFolder) {
+                const urlParams = new URLSearchParams(window.location.search);
+                currentFolder = urlParams.get('folder') || null;
+            }
+            render();
+        };
+
+        function render() {
+            container.innerHTML = '';
+            
+            if (currentFolder === null) {
+                document.getElementById('btn-back').disabled = true;
+                document.getElementById('address-text').textContent = "C:\\Documents and Settings\\Tejus\\My Documents\\Projects";
+                
+                Object.keys(projectFolders).forEach(folderName => {
+                    const folderDiv = document.createElement('div');
+                    folderDiv.className = 'file';
+                    
+                    folderDiv.ondblclick = () => {
+                        selectFolder(folderName);
+                    };
+                    
+                    const img = document.createElement('img');
+                    img.src = "../ASSETS/Windows%20XP%20High%20Resolution%20Icon%20Pack/Windows%20XP%20Icons/Folder%20Closed.png";
+                    img.alt = "Folder";
+                    
+                    const label = document.createElement('span');
+                    label.className = 'file-label';
+                    label.textContent = folderName;
+                    
+                    folderDiv.appendChild(img);
+                    folderDiv.appendChild(label);
+                    container.appendChild(folderDiv);
+                });
+            } else {
+                document.getElementById('btn-back').disabled = false;
+                document.getElementById('address-text').textContent = `C:\\Documents and Settings\\Tejus\\My Documents\\Projects\\${currentFolder}`;
+                
+                const files = projectFolders[currentFolder] || [];
+                files.forEach(project => {
+                    const fileDiv = document.createElement('div');
+                    fileDiv.className = 'file';
+                    
+                    fileDiv.ondblclick = () => {
+                        const mdPath = encodeURIComponent(`../otherassets/projects/${project}`);
+                        const backUrl = encodeURIComponent(`projects.html?folder=${encodeURIComponent(currentFolder)}`);
+                        window.location.href = `markdown_viewer.html?file=${mdPath}&back=${backUrl}`;
+                    };
+                    
+                    const img = document.createElement('img');
+                    img.src = "../ASSETS/Windows%20XP%20High%20Resolution%20Icon%20Pack/Windows%20XP%20Icons/TXT.png";
+                    img.alt = "Markdown Document";
+                    
+                    const label = document.createElement('span');
+                    label.className = 'file-label';
+                    
+                    let displayTitle = project.replace('.md', '');
+                    displayTitle = displayTitle.replace(/_/g, ' ');
+                    label.textContent = displayTitle;
+                    
+                    fileDiv.appendChild(img);
+                    fileDiv.appendChild(label);
+                    container.appendChild(fileDiv);
+                });
+            }
+        }
+
+        const urlParams = new URLSearchParams(window.location.search);
+        const initialFolder = urlParams.get('folder');
+        if (initialFolder && projectFolders[initialFolder]) {
+            currentFolder = initialFolder;
+        }
+        
+        render();
+    </script>
+</body>
+
+</html>

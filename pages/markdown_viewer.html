@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document Viewer</title>
+    <!-- Include Marked.js -->
+    <script src="../scripts/marked.min.js"></script>
+    <style>
+        body {
+            font-family: 'Tahoma', sans-serif;
+            background-color: #f5f5f5;
+            padding: 20px;
+            margin: 0;
+            color: #333;
+        }
+
+        .document-container {
+            max-width: 800px;
+            margin: 0 auto;
+            background-color: white;
+            padding: 40px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            line-height: 1.6;
+        }
+
+        a {
+            color: inherit;
+            text-decoration: underline;
+        }
+
+        a:hover {
+            text-decoration: none;
+        }
+
+        h1 {
+            text-align: center;
+            border-bottom: 2px solid #0b58a3;
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+            font-size: 2em;
+            color: #0b58a3;
+        }
+
+        h2 {
+            color: #0b58a3;
+            border-bottom: 1px solid #ccc;
+            padding-bottom: 5px;
+            margin-top: 30px;
+            font-size: 1.4em;
+            text-transform: uppercase;
+        }
+        
+        h3 {
+            color: #333;
+            font-size: 1.1em;
+            margin-bottom: 5px;
+        }
+
+        ul {
+            margin: 10px 0;
+            padding-left: 20px;
+        }
+
+        li {
+            margin-bottom: 8px;
+            line-height: 1.5;
+        }
+
+        p {
+            margin: 10px 0;
+        }
+
+        code {
+            background-color: #f0f0f0;
+            padding: 2px 4px;
+            border-radius: 3px;
+            font-family: monospace;
+        }
+
+        img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 4px;
+            margin: 20px 0;
+            display: block;
+        }
+
+        .loading {
+            text-align: center;
+            color: #666;
+            font-style: italic;
+        }
+
+        .error {
+            color: #d32f2f;
+            text-align: center;
+            font-weight: bold;
+        }
+
+        .explorer-toolbar {
+            background-color: #ece9d8;
+            border-bottom: 1px solid #d4d0c8;
+            padding: 5px 10px;
+            display: flex;
+            align-items: center;
+            font-size: 12px;
+        }
+
+        .back-btn {
+            background: #f0f0f0;
+            border: 1px solid #7f9db9;
+            cursor: pointer;
+            padding: 4px 10px;
+            font-family: Tahoma, sans-serif;
+            font-size: 12px;
+            border-radius: 3px;
+            display: flex;
+            align-items: center;
+        }
+
+        .back-btn:hover {
+            background: #e0e0e0;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            body {
+                padding: 5px;
+            }
+            .document-container {
+                padding: 15px;
+            }
+            h1 {
+                font-size: 1.5em;
+            }
+            h2 {
+                font-size: 1.2em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="toolbar" class="explorer-toolbar" style="display: none;">
+        <button id="back-btn" class="back-btn">
+            &#8592; Back
+        </button>
+    </div>
+    <div class="document-container" id="content">
+        <div class="loading">Loading document...</div>
+    </div>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            const urlParams = new URLSearchParams(window.location.search);
+            const file = urlParams.get('file');
+            const backUrl = urlParams.get('back');
+
+            if (backUrl) {
+                document.getElementById('toolbar').style.display = 'flex';
+                document.getElementById('back-btn').onclick = () => {
+                    window.location.href = backUrl;
+                };
+            }
+
+            if (!file) {
+                document.getElementById('content').innerHTML = '<div class="error">No file specified.</div>';
+                return;
+            }
+
+            // Add cache busting query parameter and no-store option
+            const fetchUrl = file + (file.includes('?') ? '&' : '?') + 't=' + new Date().getTime();
+            fetch(fetchUrl, { cache: 'no-store' })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error("Could not fetch the markdown file.");
+                    }
+                    return response.text();
+                })
+                .then(text => {
+                    // Parse markdown to HTML
+                    const html = marked.parse(text);
+                    
+                    // Create a temporary element to hold the HTML and resolve relative paths
+                    const tempDiv = document.createElement('div');
+                    tempDiv.innerHTML = html;
+                    
+                    // Get the directory of the markdown file to resolve relative paths
+                    const fileDir = file.substring(0, file.lastIndexOf('/') + 1);
+                    
+                    // Update all image sources to be relative to the markdown file
+                    tempDiv.querySelectorAll('img').forEach(img => {
+                        const src = img.getAttribute('src');
+                        if (src && !src.startsWith('http') && !src.startsWith('/') && !src.startsWith('data:')) {
+                            img.src = fileDir + src;
+                        }
+                    });
+                    
+                    // Update all media sources (audio, video, source, track) to be relative to the markdown file
+                    tempDiv.querySelectorAll('audio, video, source, track').forEach(el => {
+                        const src = el.getAttribute('src');
+                        if (src && !src.startsWith('http') && !src.startsWith('/') && !src.startsWith('data:')) {
+                            el.src = fileDir + src;
+                        }
+                    });
+                    
+                    // Update all links to be relative to the markdown file (if they aren't anchor links)
+                    tempDiv.querySelectorAll('a').forEach(a => {
+                        const href = a.getAttribute('href');
+                        if (href && !href.startsWith('http') && !href.startsWith('/') && !href.startsWith('#')) {
+                            a.href = fileDir + href;
+                        }
+                    });
+
+                    document.getElementById('content').innerHTML = tempDiv.innerHTML;
+                })
+                .catch(error => {
+                    document.getElementById('content').innerHTML = `<div class="error">Error loading document:<br>${error.message}<br><br><small>(Remember to use a local web server to test this!)</small></div>`;
+                });
+        });
+    </script>
+</body>
+</html>
